@@ -11,7 +11,6 @@ import router from '@/router';
 import store from '@/store';
 import messages from '@/locales';
 import helpers from '@/helpers';
-import { filePathToUrl } from '@/helpers/path';
 import Path from 'path';
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'));
@@ -56,8 +55,7 @@ new Vue({
                   }],
                 }, (file) => {
                   if (file !== undefined) {
-                    const path = filePathToUrl(file[0]);
-                    this.openFile(path);
+                    this.openFile(file[0]);
                   }
                 });
               },
@@ -78,6 +76,19 @@ new Vue({
             {
               label: this.$t('msg.playback.fullScreen'),
               accelerator: 'CmdOrCtrl+F',
+            },
+            {
+              label: this.$t('msg.playback.keepPlayingWindowFront'),
+              type: 'checkbox',
+              click: (menuItem, browserWindow) => {
+                if (browserWindow.isAlwaysOnTop()) {
+                  browserWindow.setAlwaysOnTop(false);
+                  menuItem.checked = false;
+                } else {
+                  browserWindow.setAlwaysOnTop(true);
+                  menuItem.checked = true;
+                }
+              },
             },
             // { label: 'Play from last stopped place' },
             // { label: 'Increase Size' },
@@ -382,7 +393,6 @@ new Vue({
     window.addEventListener('keydown', (e) => {
       switch (e.key) {
         case 'ArrowUp':
-          this.$bus.$emit('volumecontroller-appear-delay');
           this.$bus.$emit('volumeslider-appear');
           if (this.$store.state.PlaybackState.Volume + 0.1 < 1) {
             this.$bus.$emit('volume', this.$store.state.PlaybackState.Volume + 0.1);
@@ -392,7 +402,6 @@ new Vue({
           break;
 
         case 'ArrowDown':
-          this.$bus.$emit('volumecontroller-appear-delay');
           this.$bus.$emit('volumeslider-appear');
           if (this.$store.state.PlaybackState.Volume - 0.1 > 0) {
             this.$bus.$emit('volume', this.$store.state.PlaybackState.Volume - 0.1);
@@ -450,7 +459,7 @@ new Vue({
         }
       }
       if (potentialVidPath) {
-        this.openFile(potentialVidPath);
+        this.openFile(potentialVidPath.replace(/^file:\/\/\//, ''));
       }
       if (containsSubFiles) {
         this.$bus.$emit('add-subtitle', subtitleFiles);

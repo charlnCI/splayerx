@@ -1,5 +1,7 @@
 <template>
-  <div class="base-video-player">
+  <div
+    :data-component-name="$options.name"
+    class="base-video-player">
     <video class="video-element" ref="video"></video>
   </div>
 </template>
@@ -21,6 +23,7 @@ export default {
         const fileSrcRegexes = [
           RegExp('^(http|https)://'),
           RegExp('^file:///?'),
+          RegExp(/^[a-zA-Z]:\/(((?![<>:"//|?*]).)+((?<![ .])\/)?)*$/),
         ];
         return value.length > 0 && fileSrcRegexes.some(rule => rule.test(value));
       },
@@ -166,6 +169,12 @@ export default {
 <style lang="scss" scoped>
 .video-element {
   width: 100%;
+  /*
+  ** Note:
+  ** Adding the opacity properity to solve windows brightness when appling the backdrop-filter.
+  ** (This should be fixed in libcc.)
+  */
+  opacity: 0.9999;
   object-fit: cover;
 }
 </style>

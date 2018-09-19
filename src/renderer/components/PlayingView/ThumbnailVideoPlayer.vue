@@ -1,5 +1,7 @@
 <template>
-  <div class="thumbnail-video-player">
+  <div
+    :data-component-name="$options.name"
+    class="thumbnail-video-player">
     <base-video-player
       v-show="useFallback"
       ref="video"
@@ -98,19 +100,18 @@ export default {
   methods: {
     // Data validators
     videoSrcValidator(src) {
+      let result = '';
       const fileSrcRegexes = {
         http: RegExp('^(http|https)://'),
-        file: RegExp('^file:///?'),
+        notWindowsFile: RegExp('^file://'),
+        windowsFile: RegExp(/^[a-zA-Z]:\/(((?![<>:"//|?*]).)+((?<![ .])\/)?)*$/),
       };
       if (typeof src === 'string') {
-        if (fileSrcRegexes.http.test(src)) {
-          return 'http';
-        }
-        if (fileSrcRegexes.file.test(src)) {
-          return 'file';
-        }
+        Object.keys(fileSrcRegexes).forEach((filetype) => {
+          if (fileSrcRegexes[filetype].test(src)) result = filetype;
+        });
       }
-      throw new TypeError('invalid src value.');
+      return result;
     },
     // Data regenerators
     updateGenerationParameters() {
@@ -147,7 +148,6 @@ export default {
             this.tempBlobArray.length === 30) {
             const array = this.tempBlobArray;
             this.thumbnailArrayHandler(array).then(() => {
-              console.log(`${array.length} thumbnails added.`);
               this.$emit('update-thumbnail-info', {
                 index: this.autoGenerationIndex,
                 interval: this.generationInterval,
