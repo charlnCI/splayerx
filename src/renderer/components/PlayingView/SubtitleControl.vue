@@ -33,13 +33,8 @@
             </li>
 
 
-<<<<<<< HEAD
-            <li v-if="foundSubtitles && !(loadingPlaceholderList.length > 0)"
-            @mouseup.stop="toggleSubtitleOff"
-=======
             <li v-if="foundSubtitles && !(loadingSubsPlaceholders.length > 0)"
             @mouseup="toggleSubtitleOff"
->>>>>>> upstream/develop
             @mouseover.stop.self="toggleItemsMouseOver"
             @mouseleave.stop.self="toggleItemsMouseLeave"
             :class="{ chosenText: itemHasBeenChosen(-1) }">
