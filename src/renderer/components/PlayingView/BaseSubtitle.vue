@@ -355,6 +355,7 @@ export default {
         const parser = new MatroskaSubtitles();
         const lngDetector = new LanguageDetect();
 
+        self.readingMkv = true;
         parser.once('tracks', (track) => {
           tracks = track;
           tracks.forEach((trac) => {
